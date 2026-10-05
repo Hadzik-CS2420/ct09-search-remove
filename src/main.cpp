@@ -13,7 +13,7 @@ int main() {
     //   - remove    — cancel a specific order from anywhere in the queue
 
     // =========================================================================
-    // PART 1 — pop_back: last order cancelled
+    // PART 1 — pop_back: last order canceled
     // =========================================================================
 
     std::cout << "=== Part 1: Pre-Order Queue ===\n\n";
@@ -33,7 +33,7 @@ int main() {
     std::cout << "Orders pending: " << orders.get_size() << "\n\n";
 
     // --- 2. Last customer changes their mind ---
-    std::cout << "--- Last order cancelled ---\n";
+    std::cout << "--- Last order canceled ---\n";
     std::cout << "Order 2005 called in — they got impatient and left the queue.\n";
 
     // TODO: Call pop_back() to remove the last order
