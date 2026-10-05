@@ -1,5 +1,5 @@
 {
-  "name": "ct09-search-remove",
+  "name": "CS 2420 · ct09-search-remove",
   "image": "mcr.microsoft.com/devcontainers/cpp:1-ubuntu-24.04",
   "containerEnv": {
     "CC": "gcc-13",

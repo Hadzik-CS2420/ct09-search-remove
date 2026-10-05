@@ -1,17 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 750">
-  <style>
-    text { font-family: 'Segoe UI', Arial, sans-serif; }
-    .title  { font-size: 18px; font-weight: bold; fill: #1a1a1a; }
-    .step-label { font-size: 14px; font-weight: bold; fill: #333; }
-    .value  { font-size: 15px; font-weight: bold; fill: #fff; }
-    .pointer-label { font-size: 12px; font-weight: bold; fill: #8e44ad; }
-    .found  { font-size: 12px; font-weight: bold; fill: #27ae60; }
-    .missed { font-size: 12px; font-weight: bold; fill: #e74c3c; }
-    .code   { font-size: 12px; fill: #2c3e50; font-family: 'Consolas', monospace; }
-    .note   { font-size: 11px; fill: #777; font-style: italic; }
-    .value-sm { font-size: 11px; font-weight: bold; fill: #fff; }
-    .target-label { font-size: 13px; font-family: 'Consolas', monospace; fill: #7d5a00; font-weight: bold; }
-  </style>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 750" font-family="'Segoe UI', Arial, sans-serif">
+  <rect width="100%" height="100%" fill="white"/>
 
   <defs>
     <marker id="arrow" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
@@ -23,187 +11,187 @@
   </defs>
 
   <!-- Title -->
-  <text x="400" y="20" text-anchor="middle" class="title">contains: Single Pointer Traversal</text>
+  <text x="400" y="20" text-anchor="middle" font-size="18px" font-weight="bold" fill="#1a1a1a">contains: Single Pointer Traversal</text>
 
   <!-- Search target badge -->
   <rect x="210" y="28" width="380" height="26" rx="13" fill="#fff8e1" stroke="#f39c12" stroke-width="1.5"/>
-  <text x="400" y="46" text-anchor="middle" class="target-label">searching for:  data == 2003  (value = 2003)</text>
+  <text x="400" y="46" text-anchor="middle" font-size="13px" font-family="'Consolas', monospace" fill="#7d5a00" font-weight="bold">searching for:  data == 2003  (value = 2003)</text>
 
   <!-- ==================== Step 1 ==================== -->
-  <text x="20" y="78" class="step-label">Step 1: initialize — current starts at head_</text>
-  <text x="20" y="95" class="code">auto* current = head_;</text>
+  <text x="20" y="78" font-size="14px" font-weight="bold" fill="#333">Step 1: initialize — current starts at head_</text>
+  <text x="20" y="95" font-size="12px" fill="#2c3e50" font-family="'Consolas', monospace">auto* current = head_;</text>
 
   <!-- head_ above node 2004 -->
-  <text x="55" y="115" text-anchor="middle" class="pointer-label">head_</text>
+  <text x="55" y="115" text-anchor="middle" font-size="12px" font-weight="bold" fill="#8e44ad">head_</text>
   <line x1="55" y1="120" x2="55" y2="140" stroke="#8e44ad" stroke-width="2" marker-end="url(#ptr-arrow)"/>
 
   <!-- Node 2004 -->
   <rect x="20"  y="142" width="70" height="40" rx="4" fill="#2ecc71" stroke="#27ae60" stroke-width="2"/>
   <rect x="90"  y="142" width="50" height="40" rx="4" fill="#f39c12" stroke="#e67e22" stroke-width="2"/>
-  <text x="55"  y="167" text-anchor="middle" class="value">2004</text>
-  <text x="115" y="167" text-anchor="middle" class="value-sm">next</text>
+  <text x="55"  y="167" text-anchor="middle" font-size="15px" font-weight="bold" fill="#fff">2004</text>
+  <text x="115" y="167" text-anchor="middle" font-size="11px" font-weight="bold" fill="#fff">next</text>
   <line x1="140" y1="162" x2="178" y2="162" stroke="#e74c3c" stroke-width="2" marker-end="url(#arrow)"/>
 
   <!-- Node 2002 -->
   <rect x="180" y="142" width="70" height="40" rx="4" fill="#2ecc71" stroke="#27ae60" stroke-width="2"/>
   <rect x="250" y="142" width="50" height="40" rx="4" fill="#f39c12" stroke="#e67e22" stroke-width="2"/>
-  <text x="215" y="167" text-anchor="middle" class="value">2002</text>
-  <text x="275" y="167" text-anchor="middle" class="value-sm">next</text>
+  <text x="215" y="167" text-anchor="middle" font-size="15px" font-weight="bold" fill="#fff">2002</text>
+  <text x="275" y="167" text-anchor="middle" font-size="11px" font-weight="bold" fill="#fff">next</text>
   <line x1="300" y1="162" x2="338" y2="162" stroke="#e74c3c" stroke-width="2" marker-end="url(#arrow)"/>
 
   <!-- Node 2003 -->
   <rect x="340" y="142" width="70" height="40" rx="4" fill="#2ecc71" stroke="#27ae60" stroke-width="2"/>
   <rect x="410" y="142" width="50" height="40" rx="4" fill="#f39c12" stroke="#e67e22" stroke-width="2"/>
-  <text x="375" y="167" text-anchor="middle" class="value">2003</text>
-  <text x="435" y="167" text-anchor="middle" class="value-sm">next</text>
+  <text x="375" y="167" text-anchor="middle" font-size="15px" font-weight="bold" fill="#fff">2003</text>
+  <text x="435" y="167" text-anchor="middle" font-size="11px" font-weight="bold" fill="#fff">next</text>
   <line x1="460" y1="162" x2="498" y2="162" stroke="#e74c3c" stroke-width="2" marker-end="url(#arrow)"/>
 
   <!-- Node 2001 -->
   <rect x="500" y="142" width="70" height="40" rx="4" fill="#2ecc71" stroke="#27ae60" stroke-width="2"/>
   <rect x="570" y="142" width="50" height="40" rx="4" fill="#f39c12" stroke="#e67e22" stroke-width="2"/>
-  <text x="535" y="167" text-anchor="middle" class="value">2001</text>
-  <text x="595" y="167" text-anchor="middle" class="value-sm">next</text>
+  <text x="535" y="167" text-anchor="middle" font-size="15px" font-weight="bold" fill="#fff">2001</text>
+  <text x="595" y="167" text-anchor="middle" font-size="11px" font-weight="bold" fill="#fff">next</text>
   <line x1="620" y1="162" x2="658" y2="162" stroke="#e74c3c" stroke-width="2" marker-end="url(#arrow)"/>
 
   <!-- nullptr -->
   <rect x="660" y="151" width="68" height="22" rx="4" fill="#ecf0f1" stroke="#bdc3c7" stroke-width="1.5"/>
-  <text x="694" y="167" text-anchor="middle" class="missed">nullptr</text>
+  <text x="694" y="167" text-anchor="middle" font-size="12px" font-weight="bold" fill="#e74c3c">nullptr</text>
 
   <!-- current pointer below node 2004 -->
-  <text x="55" y="205" text-anchor="middle" class="pointer-label">current</text>
+  <text x="55" y="205" text-anchor="middle" font-size="12px" font-weight="bold" fill="#8e44ad">current</text>
   <line x1="55" y1="193" x2="55" y2="189" stroke="#8e44ad" stroke-width="2"/>
   <polygon points="51 189, 55 182, 59 189" fill="#8e44ad"/>
 
   <!-- ==================== Step 2 ==================== -->
-  <text x="20" y="238" class="step-label">Step 2: inspect node — not a match, advance current</text>
-  <text x="20" y="255" class="code">if (current-&gt;data == value) return true;   current = current-&gt;next;</text>
+  <text x="20" y="238" font-size="14px" font-weight="bold" fill="#333">Step 2: inspect node — not a match, advance current</text>
+  <text x="20" y="255" font-size="12px" fill="#2c3e50" font-family="'Consolas', monospace">if (current-&gt;data == value) return true;   current = current-&gt;next;</text>
 
   <!-- Node 2004 -->
   <rect x="20"  y="272" width="70" height="40" rx="4" fill="#2ecc71" stroke="#27ae60" stroke-width="2"/>
   <rect x="90"  y="272" width="50" height="40" rx="4" fill="#f39c12" stroke="#e67e22" stroke-width="2"/>
-  <text x="55"  y="297" text-anchor="middle" class="value">2004</text>
-  <text x="115" y="297" text-anchor="middle" class="value-sm">next</text>
+  <text x="55"  y="297" text-anchor="middle" font-size="15px" font-weight="bold" fill="#fff">2004</text>
+  <text x="115" y="297" text-anchor="middle" font-size="11px" font-weight="bold" fill="#fff">next</text>
   <line x1="140" y1="292" x2="178" y2="292" stroke="#e74c3c" stroke-width="2" marker-end="url(#arrow)"/>
 
   <!-- Node 2002 -->
   <rect x="180" y="272" width="70" height="40" rx="4" fill="#2ecc71" stroke="#27ae60" stroke-width="2"/>
   <rect x="250" y="272" width="50" height="40" rx="4" fill="#f39c12" stroke="#e67e22" stroke-width="2"/>
-  <text x="215" y="297" text-anchor="middle" class="value">2002</text>
-  <text x="275" y="297" text-anchor="middle" class="value-sm">next</text>
+  <text x="215" y="297" text-anchor="middle" font-size="15px" font-weight="bold" fill="#fff">2002</text>
+  <text x="275" y="297" text-anchor="middle" font-size="11px" font-weight="bold" fill="#fff">next</text>
   <line x1="300" y1="292" x2="338" y2="292" stroke="#e74c3c" stroke-width="2" marker-end="url(#arrow)"/>
 
   <!-- Node 2003 -->
   <rect x="340" y="272" width="70" height="40" rx="4" fill="#2ecc71" stroke="#27ae60" stroke-width="2"/>
   <rect x="410" y="272" width="50" height="40" rx="4" fill="#f39c12" stroke="#e67e22" stroke-width="2"/>
-  <text x="375" y="297" text-anchor="middle" class="value">2003</text>
-  <text x="435" y="297" text-anchor="middle" class="value-sm">next</text>
+  <text x="375" y="297" text-anchor="middle" font-size="15px" font-weight="bold" fill="#fff">2003</text>
+  <text x="435" y="297" text-anchor="middle" font-size="11px" font-weight="bold" fill="#fff">next</text>
   <line x1="460" y1="292" x2="498" y2="292" stroke="#e74c3c" stroke-width="2" marker-end="url(#arrow)"/>
 
   <!-- Node 2001 -->
   <rect x="500" y="272" width="70" height="40" rx="4" fill="#2ecc71" stroke="#27ae60" stroke-width="2"/>
   <rect x="570" y="272" width="50" height="40" rx="4" fill="#f39c12" stroke="#e67e22" stroke-width="2"/>
-  <text x="535" y="297" text-anchor="middle" class="value">2001</text>
-  <text x="595" y="297" text-anchor="middle" class="value-sm">next</text>
+  <text x="535" y="297" text-anchor="middle" font-size="15px" font-weight="bold" fill="#fff">2001</text>
+  <text x="595" y="297" text-anchor="middle" font-size="11px" font-weight="bold" fill="#fff">next</text>
   <line x1="620" y1="292" x2="658" y2="292" stroke="#e74c3c" stroke-width="2" marker-end="url(#arrow)"/>
 
   <!-- nullptr -->
   <rect x="660" y="281" width="68" height="22" rx="4" fill="#ecf0f1" stroke="#bdc3c7" stroke-width="1.5"/>
-  <text x="694" y="297" text-anchor="middle" class="missed">nullptr</text>
+  <text x="694" y="297" text-anchor="middle" font-size="12px" font-weight="bold" fill="#e74c3c">nullptr</text>
 
   <!-- current pointer below node 2002 (advanced past 2004) -->
-  <text x="215" y="335" text-anchor="middle" class="pointer-label">current</text>
+  <text x="215" y="335" text-anchor="middle" font-size="12px" font-weight="bold" fill="#8e44ad">current</text>
   <line x1="215" y1="323" x2="215" y2="319" stroke="#8e44ad" stroke-width="2"/>
   <polygon points="211 319, 215 312, 219 319" fill="#8e44ad"/>
 
   <!-- Step 2 note — explicit comparison showing unsorted traversal -->
-  <text x="400" y="362" text-anchor="middle" class="note">2004 ≠ 2003 (value) — loop continues, advancing current one step each iteration</text>
+  <text x="400" y="362" text-anchor="middle" font-size="11px" fill="#777" font-style="italic">2004 ≠ 2003 (value) — loop continues, advancing current one step each iteration</text>
 
   <!-- ==================== Outcome A — FOUND ==================== -->
-  <text x="20" y="392" class="step-label">Outcome A: contains(2003) — match found — return true</text>
-  <text x="20" y="409" class="code">if (current-&gt;data == value) return true;</text>
+  <text x="20" y="392" font-size="14px" font-weight="bold" fill="#333">Outcome A: contains(2003) — match found — return true</text>
+  <text x="20" y="409" font-size="12px" fill="#2c3e50" font-family="'Consolas', monospace">if (current-&gt;data == value) return true;</text>
 
   <!-- Node 2004 -->
   <rect x="20"  y="426" width="70" height="40" rx="4" fill="#2ecc71" stroke="#27ae60" stroke-width="2"/>
   <rect x="90"  y="426" width="50" height="40" rx="4" fill="#f39c12" stroke="#e67e22" stroke-width="2"/>
-  <text x="55"  y="451" text-anchor="middle" class="value">2004</text>
-  <text x="115" y="451" text-anchor="middle" class="value-sm">next</text>
+  <text x="55"  y="451" text-anchor="middle" font-size="15px" font-weight="bold" fill="#fff">2004</text>
+  <text x="115" y="451" text-anchor="middle" font-size="11px" font-weight="bold" fill="#fff">next</text>
   <line x1="140" y1="446" x2="178" y2="446" stroke="#e74c3c" stroke-width="2" marker-end="url(#arrow)"/>
 
   <!-- Node 2002 -->
   <rect x="180" y="426" width="70" height="40" rx="4" fill="#2ecc71" stroke="#27ae60" stroke-width="2"/>
   <rect x="250" y="426" width="50" height="40" rx="4" fill="#f39c12" stroke="#e67e22" stroke-width="2"/>
-  <text x="215" y="451" text-anchor="middle" class="value">2002</text>
-  <text x="275" y="451" text-anchor="middle" class="value-sm">next</text>
+  <text x="215" y="451" text-anchor="middle" font-size="15px" font-weight="bold" fill="#fff">2002</text>
+  <text x="275" y="451" text-anchor="middle" font-size="11px" font-weight="bold" fill="#fff">next</text>
   <line x1="300" y1="446" x2="338" y2="446" stroke="#e74c3c" stroke-width="2" marker-end="url(#arrow)"/>
 
   <!-- Node 2003 — MATCH (yellow highlight) -->
   <rect x="340" y="426" width="70" height="40" rx="4" fill="#f1c40f" stroke="#d4ac0d" stroke-width="3"/>
   <rect x="410" y="426" width="50" height="40" rx="4" fill="#f39c12" stroke="#e67e22" stroke-width="2"/>
-  <text x="375" y="451" text-anchor="middle" class="value">2003</text>
-  <text x="435" y="451" text-anchor="middle" class="value-sm">next</text>
+  <text x="375" y="451" text-anchor="middle" font-size="15px" font-weight="bold" fill="#fff">2003</text>
+  <text x="435" y="451" text-anchor="middle" font-size="11px" font-weight="bold" fill="#fff">next</text>
   <line x1="460" y1="446" x2="498" y2="446" stroke="#e74c3c" stroke-width="2" marker-end="url(#arrow)"/>
 
   <!-- Node 2001 -->
   <rect x="500" y="426" width="70" height="40" rx="4" fill="#2ecc71" stroke="#27ae60" stroke-width="2"/>
   <rect x="570" y="426" width="50" height="40" rx="4" fill="#f39c12" stroke="#e67e22" stroke-width="2"/>
-  <text x="535" y="451" text-anchor="middle" class="value">2001</text>
-  <text x="595" y="451" text-anchor="middle" class="value-sm">next</text>
+  <text x="535" y="451" text-anchor="middle" font-size="15px" font-weight="bold" fill="#fff">2001</text>
+  <text x="595" y="451" text-anchor="middle" font-size="11px" font-weight="bold" fill="#fff">next</text>
   <line x1="620" y1="446" x2="658" y2="446" stroke="#e74c3c" stroke-width="2" marker-end="url(#arrow)"/>
 
   <!-- nullptr -->
   <rect x="660" y="435" width="68" height="22" rx="4" fill="#ecf0f1" stroke="#bdc3c7" stroke-width="1.5"/>
-  <text x="694" y="451" text-anchor="middle" class="missed">nullptr</text>
+  <text x="694" y="451" text-anchor="middle" font-size="12px" font-weight="bold" fill="#e74c3c">nullptr</text>
 
   <!-- current pointer below node 2003 -->
-  <text x="375" y="489" text-anchor="middle" class="pointer-label">current</text>
+  <text x="375" y="489" text-anchor="middle" font-size="12px" font-weight="bold" fill="#8e44ad">current</text>
   <line x1="375" y1="477" x2="375" y2="473" stroke="#8e44ad" stroke-width="2"/>
   <polygon points="371 473, 375 466, 379 473" fill="#8e44ad"/>
 
-  <text x="375" y="517" text-anchor="middle" class="found">current-&gt;data == value  (2003 == 2003)  →  return true</text>
+  <text x="375" y="517" text-anchor="middle" font-size="12px" font-weight="bold" fill="#27ae60">current-&gt;data == value  (2003 == 2003)  →  return true</text>
 
   <!-- ==================== Outcome B — NOT FOUND ==================== -->
-  <text x="20" y="547" class="step-label">Outcome B: contains(9999) — not in list — return false</text>
-  <text x="20" y="564" class="code">// loop exits when current reaches nullptr — value was never found</text>
+  <text x="20" y="547" font-size="14px" font-weight="bold" fill="#333">Outcome B: contains(9999) — not in list — return false</text>
+  <text x="20" y="564" font-size="12px" fill="#2c3e50" font-family="'Consolas', monospace">// loop exits when current reaches nullptr — value was never found</text>
 
   <!-- Node 2004 -->
   <rect x="20"  y="581" width="70" height="40" rx="4" fill="#2ecc71" stroke="#27ae60" stroke-width="2"/>
   <rect x="90"  y="581" width="50" height="40" rx="4" fill="#f39c12" stroke="#e67e22" stroke-width="2"/>
-  <text x="55"  y="606" text-anchor="middle" class="value">2004</text>
-  <text x="115" y="606" text-anchor="middle" class="value-sm">next</text>
+  <text x="55"  y="606" text-anchor="middle" font-size="15px" font-weight="bold" fill="#fff">2004</text>
+  <text x="115" y="606" text-anchor="middle" font-size="11px" font-weight="bold" fill="#fff">next</text>
   <line x1="140" y1="601" x2="178" y2="601" stroke="#e74c3c" stroke-width="2" marker-end="url(#arrow)"/>
 
   <!-- Node 2002 -->
   <rect x="180" y="581" width="70" height="40" rx="4" fill="#2ecc71" stroke="#27ae60" stroke-width="2"/>
   <rect x="250" y="581" width="50" height="40" rx="4" fill="#f39c12" stroke="#e67e22" stroke-width="2"/>
-  <text x="215" y="606" text-anchor="middle" class="value">2002</text>
-  <text x="275" y="606" text-anchor="middle" class="value-sm">next</text>
+  <text x="215" y="606" text-anchor="middle" font-size="15px" font-weight="bold" fill="#fff">2002</text>
+  <text x="275" y="606" text-anchor="middle" font-size="11px" font-weight="bold" fill="#fff">next</text>
   <line x1="300" y1="601" x2="338" y2="601" stroke="#e74c3c" stroke-width="2" marker-end="url(#arrow)"/>
 
   <!-- Node 2003 -->
   <rect x="340" y="581" width="70" height="40" rx="4" fill="#2ecc71" stroke="#27ae60" stroke-width="2"/>
   <rect x="410" y="581" width="50" height="40" rx="4" fill="#f39c12" stroke="#e67e22" stroke-width="2"/>
-  <text x="375" y="606" text-anchor="middle" class="value">2003</text>
-  <text x="435" y="606" text-anchor="middle" class="value-sm">next</text>
+  <text x="375" y="606" text-anchor="middle" font-size="15px" font-weight="bold" fill="#fff">2003</text>
+  <text x="435" y="606" text-anchor="middle" font-size="11px" font-weight="bold" fill="#fff">next</text>
   <line x1="460" y1="601" x2="498" y2="601" stroke="#e74c3c" stroke-width="2" marker-end="url(#arrow)"/>
 
   <!-- Node 2001 -->
   <rect x="500" y="581" width="70" height="40" rx="4" fill="#2ecc71" stroke="#27ae60" stroke-width="2"/>
   <rect x="570" y="581" width="50" height="40" rx="4" fill="#f39c12" stroke="#e67e22" stroke-width="2"/>
-  <text x="535" y="606" text-anchor="middle" class="value">2001</text>
-  <text x="595" y="606" text-anchor="middle" class="value-sm">next</text>
+  <text x="535" y="606" text-anchor="middle" font-size="15px" font-weight="bold" fill="#fff">2001</text>
+  <text x="595" y="606" text-anchor="middle" font-size="11px" font-weight="bold" fill="#fff">next</text>
   <line x1="620" y1="601" x2="658" y2="601" stroke="#e74c3c" stroke-width="2" marker-end="url(#arrow)"/>
 
   <!-- nullptr — current lands here -->
   <rect x="660" y="590" width="68" height="22" rx="4" fill="#ecf0f1" stroke="#bdc3c7" stroke-width="1.5"/>
-  <text x="694" y="606" text-anchor="middle" class="missed">nullptr</text>
+  <text x="694" y="606" text-anchor="middle" font-size="12px" font-weight="bold" fill="#e74c3c">nullptr</text>
 
   <!-- current pointer below nullptr box -->
-  <text x="694" y="645" text-anchor="middle" class="pointer-label">current</text>
+  <text x="694" y="645" text-anchor="middle" font-size="12px" font-weight="bold" fill="#8e44ad">current</text>
   <line x1="694" y1="633" x2="694" y2="618" stroke="#8e44ad" stroke-width="2"/>
   <polygon points="690 618, 694 612, 698 618" fill="#8e44ad"/>
 
-  <text x="400" y="678" text-anchor="middle" class="missed">current == nullptr — 9999 was not found in the list  →  return false</text>
+  <text x="400" y="678" text-anchor="middle" font-size="12px" font-weight="bold" fill="#e74c3c">current == nullptr — 9999 was not found in the list  →  return false</text>
 
   <!-- Bottom note -->
-  <text x="400" y="705" text-anchor="middle" class="note">O(n) worst case — no shortcut for an unsorted list. Every node may need inspection.</text>
+  <text x="400" y="705" text-anchor="middle" font-size="11px" fill="#777" font-style="italic">O(n) worst case — no shortcut for an unsorted list. Every node may need inspection.</text>
 </svg>
