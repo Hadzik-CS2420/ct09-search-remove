@@ -1,8 +1,18 @@
-# CT8 — Search & Remove
+# Code-Together 09: Search & Remove
 
 ## Overview
 
 An in-class code-together activity deepening students' understanding of singly linked lists through Farr's Ice Cream's pre-order queue. The simpler operations (destructor, push_front, push_back, pop_front, pop_back, print) are already implemented — students focus on `contains` and `remove`, both of which apply the same trailing pointer pattern seen in `pop_back`.
+
+> ▶️ **Run the tests yourself.** From the top of this repo:
+>
+> ```
+> python3 tests/scorecard.py
+> ```
+>
+> It builds if it needs to, runs the suite, and prints a scored breakdown that
+> matches what the autograder awards. Submit a **screenshot of that output** —
+> not a repository URL.
 
 ## Learning Objectives
 
