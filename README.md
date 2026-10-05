@@ -14,6 +14,12 @@ An in-class code-together activity deepening students' understanding of singly l
 > matches what the autograder awards. Submit a **screenshot of that output** —
 > not a repository URL.
 
+> ▶️ **Watch remove() run, one pointer at a time.** Your repo has
+> `images/stepper.html` — **double-click it** to open it in your browser and
+> press **Next**. It walks `contains` and every case of `remove` — head, middle,
+> tail, not found — and shows the three ways `remove` goes wrong while still
+> compiling. Nothing to install, and it works offline.
+
 ## Learning Objectives
 
 - Use the **trailing pointer pattern** (`previous`/`current`) to locate and unlink a node by value

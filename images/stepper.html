@@ -1,0 +1,737 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CS 2420 &middot; List Stepper</title>
+<!--
+  List Stepper -- CT 09, Search & Remove
+
+  Open this file in a browser. Double-click it, or right-click in VS Code ->
+  "Reveal in File Explorer" and double-click there. Nothing to install, no
+  internet needed, no extension: it is one self-contained file.
+
+  WHY NOT IN VS CODE: VS Code has no built-in HTML preview that runs
+  JavaScript. The markdown preview strips scripts and Simple Browser needs a
+  URL. Every student already has a browser.
+
+  The still diagrams in images/ show remove() before and after. What they
+  cannot show is the ORDER: previous->next has to be rewired while current
+  still exists, and the loop has to look at the last node too. Every bug in
+  remove() is an ordering bug, so this file steps through it one pointer
+  change at a time.
+
+  Unlike the CT 05-07 steppers, frames here are not written out by hand. A
+  tiny model of the list (nodes, head_, previous, current, size_) is mutated
+  line by line, and each frame is a snapshot of it -- so the picture is
+  whatever the code would actually do, and cannot drift from it.
+
+  Addresses are made up and deliberately tidy. Real ones are long, ugly and
+  different every run.
+
+  Everything is deliberately plain: no libraries, no build step, no fetch().
+  It has to work from a file:// URL on a Chromebook.
+-->
+<style>
+  :root {
+    --ink: #1a1a2e; --muted: #555; --line: #cbd5e1; --panel: #f8fafc;
+    --blue: #2573a7; --green: #1c7e45; --red: #c0392b; --orange: #a95c19;
+    --purple: #8e44ad; --teal: #00695c;
+    --zoom: 2.2;
+  }
+  html { font-size: calc(16px * var(--zoom)); }
+  * { box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif; color: var(--ink);
+    background: #fff; margin: 0; padding: 0 1rem 4rem; line-height: 1.5;
+  }
+  .wrap { max-width: min(1700px, 97vw); margin: 0 auto; }
+  header {
+    background: linear-gradient(135deg,#00695c 0%,#00796b 100%);
+    color: #fff; border-radius: 12px; padding: 1.5rem 2rem; margin: 1.5rem 0;
+  }
+  header h1 { margin: 0; font-size: 1.5rem; }
+  header p { margin: .5rem 0 0; font-size: .95rem; }
+  nav { margin-bottom: 1.5rem; font-size: .9rem; }
+  nav a {
+    display: inline-block; margin: 0 .5rem .4rem 0; padding: .3rem .7rem;
+    background: #e0f2f1; color: #00695c; border-radius: 999px;
+    text-decoration: none; border: 1px solid #b2dfdb;
+  }
+  nav a:hover, nav a:focus { background: #b2dfdb; }
+  section {
+    border: 1px solid var(--line); border-radius: 10px; padding: 1.25rem 1.5rem;
+    margin-bottom: 1.75rem;
+  }
+  section > h2 { margin: 0 0 .25rem; font-size: 1.15rem; }
+  .sub { margin: 0 0 1rem; color: var(--muted); font-size: .9rem; }
+  .cols { display: flex; gap: 1.25rem; flex-wrap: wrap; }
+  .col { flex: 1 1 20rem; min-width: 18rem; }
+  pre.code {
+    background: #1e1e2e; color: #cdd6f4; border-radius: 8px; padding: .85rem 0;
+    font-family: Consolas, 'Courier New', monospace; font-size: .8rem;
+    line-height: 1.7; margin: 0; overflow-x: auto;
+  }
+  pre.code .ln {
+    display: block; padding: 0 1rem 0 1.75rem; white-space: pre;
+    border-left: .35rem solid transparent; position: relative;
+  }
+  pre.code .ln.on {
+    background: #51546b; border-left-color: #f9e2af; color: #fff;
+    box-shadow: inset 0 0 0 .08rem rgba(249, 226, 175, .55);
+  }
+  pre.code .ln.on::before {
+    content: "\25B6"; position: absolute; left: .5rem; color: #f9e2af;
+  }
+  .kw { color: #cba6f7; } .fn { color: #89dceb; } .st { color: #a6e3a1; }
+  .nu { color: #fab387; } .cm { color: #9399b2; font-style: italic; }
+  .ty { color: #f9e2af; } .bad { color: #f38ba8; font-weight: bold; }
+  .panel {
+    background: var(--panel); border: 1px solid var(--line); border-radius: 8px;
+    padding: .75rem 1rem; margin-top: .75rem;
+  }
+  .panel h3 {
+    margin: 0 0 .5rem; font-size: .75rem; letter-spacing: .06em;
+    text-transform: uppercase; color: #37474f;
+  }
+  .panel.vars-p { border-left: .25rem solid var(--blue); }
+  .panel.list-p { border-left: .25rem solid var(--orange); }
+  .vars { display: flex; gap: .5rem; flex-wrap: wrap; }
+  .var {
+    background: #fff; border: 1px solid var(--line); border-radius: 6px;
+    padding: .3rem .6rem; font-family: Consolas, monospace; font-size: .8rem;
+  }
+  .var b { color: var(--blue); font-weight: 600; }
+  .var.changed { border-color: var(--green); background: #e8f5e9; }
+  .var.dead { border-color: var(--red); background: #fce4ec; color: #8e1b10; }
+  .out {
+    font-family: Consolas, monospace; font-size: .85rem; white-space: pre;
+    min-height: 2.5rem; margin: 0; color: var(--ink);
+  }
+  .note { font-size: .88rem; color: var(--muted); min-height: 3.2rem; margin: .6rem 0 0; }
+  .note b { color: var(--ink); }
+  .controls { display: flex; gap: .5rem; align-items: center; margin-top: .9rem; flex-wrap: wrap; }
+  button {
+    font: inherit; font-size: .88rem; padding: .4rem .9rem; border-radius: 6px;
+    border: 1px solid #00695c; background: #00695c; color: #fff; cursor: pointer;
+  }
+  button.ghost { background: #fff; color: #00695c; }
+  button:disabled { opacity: .4; cursor: default; }
+  .count { font-size: .85rem; color: var(--muted); margin-left: auto; font-variant-numeric: tabular-nums; }
+  label.opt { font-size: .88rem; color: var(--muted); display: inline-flex; align-items: center; gap: .35rem; }
+  select { font: inherit; font-size: .88rem; padding: .25rem; }
+
+  /* The list. Nodes keep their position for the whole demo, even after they
+     are unlinked or freed -- the point is to watch the arrows change around
+     them, not to watch boxes slide. */
+  .chain { display: flex; gap: .45rem; flex-wrap: nowrap; align-items: flex-end; overflow-x: auto; padding-bottom: .8rem; }
+  .slot { display: flex; flex-direction: column; align-items: center; gap: .25rem; flex: 0 0 auto; }
+  .tags { display: flex; flex-direction: column; align-items: center; gap: .15rem; min-height: 3.6rem; justify-content: flex-end; }
+  .tag {
+    font-family: Consolas, monospace; font-size: .66rem; padding: .05rem .4rem;
+    border-radius: 999px; color: #fff; white-space: nowrap;
+  }
+  .tag.head_    { background: var(--purple); }
+  .tag.previous { background: var(--blue); }
+  .tag.current  { background: var(--green); }
+  .tag.dangling { background: var(--red); }
+  .tag::after { content: " \2193"; }
+  .node {
+    border: 2px solid var(--line); border-radius: 7px; background: #fff;
+    font-family: Consolas, monospace; text-align: center; min-width: 4.6rem;
+    padding: .2rem .35rem;
+  }
+  .node .nv { display: block; font-size: 1rem; font-weight: bold; }
+  .node .nn { display: block; font-size: .66rem; color: var(--muted); border-top: 1px solid var(--line); margin-top: .1rem; padding-top: .1rem; }
+  .node .nn.chg { color: #fff; background: var(--green); border-radius: 3px; }
+  .node .nn.garbage { color: #fff; background: var(--red); border-radius: 3px; }
+  .node .addr { display: block; font-size: .58rem; color: #757575; }
+  .node.now  { border-color: var(--green); background: #e8f5e9; }
+  .node.hit  { border-color: var(--orange); background: #fff3e0; }
+  .node.cut  { border-style: dashed; border-color: var(--orange); background: #fef5ec; transform: translateY(.6rem); }
+  .node.free { border-style: dashed; color: #9e9e9e; background: #fafafa; transform: translateY(.6rem); }
+  .node.free .nv { text-decoration: line-through; }
+  .nullend {
+    font-family: Consolas, monospace; font-size: .75rem; color: var(--muted);
+    border: 1px dashed var(--line); border-radius: 7px; padding: .55rem .4rem;
+  }
+  footer { color: var(--muted); font-size: .85rem; border-top: 1px solid var(--line); padding-top: 1rem; }
+  .sizebar { display: flex; align-items: center; gap: .4rem; flex-wrap: wrap; margin-top: .9rem; font-size: .8rem; }
+  .sizebar button {
+    background: rgba(255,255,255,.16); color: #fff; border-color: rgba(255,255,255,.6);
+    font-size: .8rem; padding: .25rem .7rem;
+  }
+  .sizebar button:hover { background: rgba(255,255,255,.3); }
+  .sizebar .val { font-variant-numeric: tabular-nums; opacity: .85; }
+  .key { font-size: .78rem; color: var(--muted); margin: .5rem 0 0; }
+  .key span { display: inline-block; margin-right: .8rem; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>List Stepper</h1>
+  <p>CS 2420 &middot; Module 4 &middot; Code-Together 09 &middot; press <b>Next</b> (or the &rarr; key)
+     and watch the pointers move.</p>
+  <div class="sizebar" id="sizebar">
+    <span>Text size</span>
+    <button data-zoom="out" title="Smaller">A&minus;</button>
+    <button data-zoom="in" title="Bigger">A+</button>
+    <button data-zoom="projector">Projector</button>
+    <button data-zoom="reset">Reset</button>
+    <span class="val" id="zoomval"></span>
+  </div>
+</header>
+
+<nav>
+  <a href="#d1">1. contains &mdash; one pointer is enough</a>
+  <a href="#d2">2. remove &mdash; the trailing pointer</a>
+  <a href="#d3">3. Where remove goes wrong</a>
+</nav>
+
+<section id="d1">
+  <h2>1. <code>contains</code> &mdash; one pointer is enough</h2>
+  <p class="sub">A search only reads. Nothing gets relinked, so there is no need for a
+     <code>previous</code> &mdash; one <code>current</code> walks until it finds the value or falls off the end.</p>
+  <div class="controls" style="margin: 0 0 .9rem;">
+    <label class="opt">Look for
+      <select data-opt="target">
+        <option value="30">30 &mdash; at the tail</option>
+        <option value="20">20 &mdash; in the middle</option>
+        <option value="99">99 &mdash; not in the list</option>
+      </select>
+    </label>
+  </div>
+  <div class="cols">
+    <div class="col">
+      <pre class="code" data-code></pre>
+    </div>
+    <div class="col">
+      <div class="panel list-p"><h3>The list</h3><div class="chain" data-chain></div></div>
+      <div class="panel vars-p"><h3>Variables</h3><div class="vars" data-vars></div></div>
+      <div class="panel"><h3>Returns</h3><p class="out" data-out></p></div>
+    </div>
+  </div>
+  <p class="note" data-note></p>
+  <div class="controls" data-controls></div>
+</section>
+
+<section id="d2">
+  <h2>2. <code>remove</code> &mdash; the trailing pointer</h2>
+  <p class="sub">Same walk as <code>pop_back</code>, except it stops on a <b>match</b> instead of at the
+     end. Try every case: each one takes a different path through the same function.</p>
+  <div class="controls" style="margin: 0 0 .9rem;">
+    <label class="opt">Remove
+      <select data-opt="target">
+        <option value="20">20 &mdash; the middle case</option>
+        <option value="30">30 &mdash; the tail case</option>
+        <option value="10">10 &mdash; the head case</option>
+        <option value="99">99 &mdash; not in the list</option>
+      </select>
+    </label>
+  </div>
+  <div class="cols">
+    <div class="col">
+      <pre class="code" data-code></pre>
+    </div>
+    <div class="col">
+      <div class="panel list-p"><h3>The list</h3><div class="chain" data-chain></div>
+        <p class="key"><span>solid = linked in</span><span>dashed orange = unlinked, still allocated</span><span>dashed grey = freed</span></p></div>
+      <div class="panel vars-p"><h3>Variables</h3><div class="vars" data-vars></div></div>
+      <div class="panel"><h3>print()</h3><p class="out" data-out></p></div>
+    </div>
+  </div>
+  <p class="note" data-note></p>
+  <div class="controls" data-controls></div>
+</section>
+
+<section id="d3">
+  <h2>3. Where <code>remove</code> goes wrong</h2>
+  <p class="sub">Four versions of the same few lines. Only one is right, and the other three all compile
+     and run without a word of complaint.</p>
+  <div class="controls" style="margin: 0 0 .9rem;">
+    <label class="opt">Version
+      <select data-opt="bug">
+        <option value="none">correct &mdash; relink, delete, shrink</option>
+        <option value="early">delete before relinking</option>
+        <option value="loopnext">loop on current-&gt;next, copied from pop_back</option>
+        <option value="nosize">forget --size_</option>
+      </select>
+    </label>
+  </div>
+  <div class="cols">
+    <div class="col">
+      <pre class="code" data-code></pre>
+    </div>
+    <div class="col">
+      <div class="panel list-p"><h3>The list</h3><div class="chain" data-chain></div></div>
+      <div class="panel vars-p"><h3>Variables</h3><div class="vars" data-vars></div></div>
+      <div class="panel"><h3>Verdict</h3><p class="out" data-out></p></div>
+    </div>
+  </div>
+  <p class="note" data-note></p>
+  <div class="controls" data-controls></div>
+</section>
+
+<footer>
+  <p>Part of <b>Code-Together 09</b>. The still versions are in <code>images/</code>, and the Diagrams
+     table in <code>README.md</code> says what each one is for.</p>
+</footer>
+
+</div>
+
+<script>
+/* Text size -- one custom property drives every rem on the page, and the
+   choice is remembered per machine. Same as the CT 05-07 steppers. */
+(function () {
+  var root = document.documentElement, KEY = "cs2420-stepper-zoom", DEFAULT = 2.2;
+  var out = document.getElementById("zoomval");
+  function set(z) {
+    z = Math.max(1, Math.min(4.5, Math.round(z * 10) / 10));
+    root.style.setProperty("--zoom", z);
+    if (out) { out.textContent = Math.round(z / DEFAULT * 100) + "%"; }
+    try { localStorage.setItem(KEY, z); } catch (e) {}
+  }
+  function current() {
+    return parseFloat(getComputedStyle(root).getPropertyValue("--zoom")) || DEFAULT;
+  }
+  var saved = NaN;
+  try { saved = parseFloat(localStorage.getItem(KEY)); } catch (e) {}
+  set(isNaN(saved) ? DEFAULT : saved);
+  document.getElementById("sizebar").addEventListener("click", function (e) {
+    var act = e.target.getAttribute("data-zoom");
+    if (!act) { return; }
+    if (act === "in") { set(current() + 0.2); }
+    if (act === "out") { set(current() - 0.2); }
+    if (act === "projector") { set(3.2); }
+    if (act === "reset") { set(DEFAULT); }
+  });
+})();
+
+function esc(s) {
+  return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+/* ------------------------------------------------------------------ *
+ * The list model.
+ *
+ * A list is { nodes, head, ptr, size }. nodes never move or disappear --
+ * a node that is unlinked or deleted just changes state, so it stays on
+ * screen where it was. next is a node index, null (nullptr) or "garbage"
+ * (read out of freed memory). ptr holds the local pointers: an index,
+ * null, or absent when the variable has not been declared yet.
+ * ------------------------------------------------------------------ */
+var ADDR = ["0x7A10", "0x7A40", "0x7A70", "0x7AA0"];
+
+function makeList(vals) {
+  return {
+    nodes: vals.map(function (v, k) {
+      return { v: v, addr: ADDR[k], next: k + 1 < vals.length ? k + 1 : null, state: "", chg: false };
+    }),
+    head: 0, ptr: {}, size: vals.length
+  };
+}
+function clone(L) { return JSON.parse(JSON.stringify(L)); }
+
+/* What a pointer variable displays as. A pointer to a freed node still
+   holds the address -- that is exactly what "dangling" means. */
+function ptrText(L, p) {
+  if (p === null) { return "nullptr"; }
+  var n = L.nodes[p];
+  return n.addr + "  (" + (n.state === "free" ? "dangling" : n.v) + ")";
+}
+
+/* print() as the real one would produce it, walking from head_. */
+function printed(L) {
+  var s = "", p = L.head, guard = 0;
+  while (p !== null && guard++ < 10) {
+    if (p === "garbage" || L.nodes[p].state === "free") { return s + "?? -> (reading freed memory)"; }
+    s += L.nodes[p].v + " -> ";
+    p = L.nodes[p].next;
+  }
+  return s + "nullptr";
+}
+
+/* Collects frames. Each push snapshots the list and works out which
+   variables changed since the previous frame, so nobody has to mark
+   "changed" by hand. */
+function Recorder(code, fixed) {
+  var frames = [], last = {};
+  return {
+    frames: frames,
+    push: function (line, L, note, out) {
+      var vars = (fixed || []).map(function (v) { return { name: v[0], value: v[1] }; });
+      ["previous", "current"].forEach(function (k) {
+        if (k in L.ptr) {
+          var p = L.ptr[k];
+          vars.push({ name: k, value: ptrText(L, p),
+                      dead: p !== null && L.nodes[p].state === "free" });
+        }
+      });
+      vars.push({ name: "size_", value: String(L.size) });
+      vars.forEach(function (v) {
+        v.changed = !v.dead && last[v.name] !== undefined && last[v.name] !== v.value;
+        last[v.name] = v.value;
+      });
+      frames.push({ code: code, line: line, chain: clone(L), vars: vars, out: out, note: note });
+      L.nodes.forEach(function (n) { n.chg = false; });
+    }
+  };
+}
+
+function chainHtml(L) {
+  function tags(match) {
+    var t = "";
+    if (L.head === match) { t += '<span class="tag head_">head_</span>'; }
+    ["previous", "current"].forEach(function (k) {
+      if (k in L.ptr && L.ptr[k] === match) {
+        var dangling = match !== null && L.nodes[match].state === "free";
+        t += '<span class="tag ' + (dangling ? "dangling" : k) + '">' + k + "</span>";
+      }
+    });
+    return '<div class="tags">' + t + "</div>";
+  }
+  var html = L.nodes.map(function (n, k) {
+    var nx, cls = "nn" + (n.chg ? " chg" : "");
+    if (n.next === "garbage") { nx = "next &rarr; ??"; cls = "nn garbage"; }
+    else if (n.next === null) { nx = "next &rarr; null"; }
+    else { nx = "next &rarr; " + L.nodes[n.next].v; }
+    var label = n.state === "free" ? "freed" : n.state === "cut" ? "unlinked" : n.addr;
+    return '<div class="slot">' + tags(k) + '<div class="node ' + n.state + '">' +
+           '<span class="nv">' + n.v + '</span><span class="' + cls + '">' + nx + "</span>" +
+           '<span class="addr">' + label + "</span></div></div>";
+  }).join("");
+  return html + '<div class="slot">' + tags(null) + '<div class="nullend">nullptr</div></div>';
+}
+
+/* ------------------------------------------------------------------ *
+ * The harness. Frames are computed up front, so Prev is just an index
+ * going down and can never desynchronize from the code.
+ * ------------------------------------------------------------------ */
+function Stepper(section, build) {
+  var i = 0, frames = [], timer = null;
+  var codeEl  = section.querySelector("[data-code]");
+  var varsEl  = section.querySelector("[data-vars]");
+  var outEl   = section.querySelector("[data-out]");
+  var chainEl = section.querySelector("[data-chain]");
+  var noteEl  = section.querySelector("[data-note]");
+  var bar     = section.querySelector("[data-controls]");
+
+  bar.innerHTML =
+    '<button class="ghost" data-act="prev">&larr; Prev</button>' +
+    '<button data-act="next">Next &rarr;</button>' +
+    '<button class="ghost" data-act="play">Play</button>' +
+    '<button class="ghost" data-act="reset">Reset</button>' +
+    '<span class="count" data-count></span>';
+  var countEl = bar.querySelector("[data-count]");
+  var playBtn = bar.querySelector('[data-act="play"]');
+
+  function draw() {
+    var f = frames[i] || {};
+    codeEl.innerHTML = (f.code || []).map(function (line, n) {
+      // A blank spacer line must still occupy a row -- an empty span collapses
+      // to zero height and the grouping the code was written with disappears.
+      return '<span class="ln' + (n === f.line ? " on" : "") + '">' +
+             (line === "" ? "&nbsp;" : line) + "</span>";
+    }).join("");
+    varsEl.innerHTML = (f.vars || []).map(function (v) {
+      return '<span class="var' + (v.changed ? " changed" : "") + (v.dead ? " dead" : "") +
+             '"><b>' + esc(v.name) + "</b> = " + esc(v.value) + "</span>";
+    }).join("");
+    if (chainEl) { chainEl.innerHTML = f.chain ? chainHtml(f.chain) : ""; }
+    if (outEl)   { outEl.textContent = f.out ? f.out : " "; }
+    if (noteEl)  { noteEl.innerHTML = f.note || "&nbsp;"; }
+    countEl.textContent = "step " + (i + 1) + " of " + frames.length;
+    bar.querySelector('[data-act="prev"]').disabled = (i === 0);
+    bar.querySelector('[data-act="next"]').disabled = (i === frames.length - 1);
+  }
+
+  function go(n) {
+    i = Math.max(0, Math.min(frames.length - 1, n));
+    draw();
+    if (timer && i === frames.length - 1) { stop(); }
+  }
+  function stop() { clearInterval(timer); timer = null; playBtn.textContent = "Play"; }
+  function play() {
+    if (timer) { stop(); return; }
+    if (i === frames.length - 1) { i = 0; }
+    playBtn.textContent = "Pause";
+    timer = setInterval(function () { go(i + 1); }, 1100);
+  }
+
+  bar.addEventListener("click", function (e) {
+    var act = e.target.getAttribute("data-act");
+    if (!act) { return; }
+    if (act === "next") { stop(); go(i + 1); }
+    if (act === "prev") { stop(); go(i - 1); }
+    if (act === "reset") { stop(); go(0); }
+    if (act === "play") { play(); }
+  });
+
+  section.setAttribute("tabindex", "0");
+  section.addEventListener("keydown", function (e) {
+    if (e.key === "ArrowRight") { stop(); go(i + 1); e.preventDefault(); }
+    if (e.key === "ArrowLeft")  { stop(); go(i - 1); e.preventDefault(); }
+  });
+
+  section.querySelectorAll("[data-opt]").forEach(function (el) {
+    el.addEventListener("change", function () { stop(); rebuild(); });
+  });
+
+  function opts() {
+    var o = {};
+    section.querySelectorAll("[data-opt]").forEach(function (el) {
+      o[el.getAttribute("data-opt")] = (el.type === "checkbox") ? el.checked : el.value;
+    });
+    return o;
+  }
+  function rebuild() { frames = build(opts()); i = 0; draw(); }
+  rebuild();
+  section.stepper = { count: function () { return frames.length; }, go: go, frames: function () { return frames; } };
+}
+
+/* ------------------------------------------------------------------ *
+ * Demo 1 -- contains
+ * ------------------------------------------------------------------ */
+Stepper(document.getElementById("d1"), function (o) {
+  var target = parseInt(o.target || "30", 10);
+  var code = [
+    '<span class="ty">bool</span> SinglyLinkedList::<span class="fn">contains</span>(<span class="ty">int</span> value) <span class="kw">const</span> {',
+    '    <span class="kw">auto</span>* current = head_;',
+    '    <span class="kw">while</span> (current) {',
+    '        <span class="kw">if</span> (current-&gt;data == value)',
+    '            <span class="kw">return</span> <span class="kw">true</span>;',
+    '        current = current-&gt;next;',
+    '    }',
+    '    <span class="kw">return</span> <span class="kw">false</span>;',
+    '}'
+  ];
+  var L = makeList([10, 20, 30]);
+  var R = Recorder(code, [["value", String(target)]]);
+  R.push(0, L, "Looking for <b>" + target + "</b>. <code>contains</code> is <b>const</b>: it promises not to " +
+         "change the list, so it may read <b>head_</b> but never move it.", "");
+  L.ptr.current = L.head;
+  R.push(1, L, "A <b>local</b> pointer starts at the head. We walk <b>current</b>, not <b>head_</b> &mdash; " +
+         "moving <b>head_</b> would lose the list, and the compiler would refuse anyway.", "");
+  var c = L.ptr.current;
+  while (true) {
+    if (c === null) {
+      R.push(2, L, "<b>current</b> is <b>nullptr</b>: we walked off the end without a match. " +
+             "Every node had to be checked to be sure &mdash; that is the O(n) worst case.", "");
+      R.push(7, L, "Return <b>false</b>. This line runs only <i>after</i> the loop &mdash; put it inside " +
+             "and the search gives up after one node.", "false");
+      break;
+    }
+    R.push(2, L, "<b>current</b> is not null, so there is a node to look at.", "");
+    L.nodes[c].state = "now";
+    var hit = L.nodes[c].v === target;
+    if (hit) { L.nodes[c].state = "hit"; }
+    R.push(3, L, "Is <b>" + L.nodes[c].v + "</b> equal to <b>" + target + "</b>? " +
+           (hit ? "<b>Yes.</b>" : "No &mdash; keep walking."), "");
+    if (hit) {
+      R.push(4, L, "Return <b>true</b> straight away. The nodes after this one are never looked at.", "true");
+      break;
+    }
+    L.nodes[c].state = "";
+    c = L.nodes[c].next;
+    L.ptr.current = c;
+    R.push(5, L, c === null
+      ? "Advance. The last node&#x2019;s <b>next</b> is <b>nullptr</b>, so that is where <b>current</b> lands."
+      : "Advance to the next node. One pointer, one step &mdash; nothing in the list changes.", "");
+  }
+  return R.frames;
+});
+
+/* ------------------------------------------------------------------ *
+ * Demo 2 -- remove, every case
+ * ------------------------------------------------------------------ */
+Stepper(document.getElementById("d2"), function (o) {
+  var target = parseInt(o.target || "20", 10);
+  var code = [
+    '<span class="ty">void</span> SinglyLinkedList::<span class="fn">remove</span>(<span class="ty">int</span> value) {',
+    '    <span class="kw">if</span> (!head_) <span class="kw">return</span>;',
+    '',
+    '    <span class="kw">if</span> (head_-&gt;data == value) {',
+    '        <span class="fn">pop_front</span>();',
+    '        <span class="kw">return</span>;',
+    '    }',
+    '',
+    '    <span class="kw">auto</span>* previous = head_;',
+    '    <span class="kw">auto</span>* current  = head_-&gt;next;',
+    '    <span class="kw">while</span> (current) {',
+    '        <span class="kw">if</span> (current-&gt;data == value) {',
+    '            previous-&gt;next = current-&gt;next;',
+    '            <span class="kw">delete</span> current;',
+    '            --size_;',
+    '            <span class="kw">return</span>;',
+    '        }',
+    '        previous = current;',
+    '        current  = current-&gt;next;',
+    '    }',
+    '}'
+  ];
+  var L = makeList([10, 20, 30]);
+  var R = Recorder(code, [["value", String(target)]]);
+  R.push(0, L, "Remove <b>" + target + "</b> from <b>10 &rarr; 20 &rarr; 30</b>.", printed(L));
+  R.push(1, L, "Case one, the empty list: nothing to remove. This list has nodes, so carry on.", printed(L));
+
+  if (L.nodes[0].v === target) {
+    L.nodes[0].state = "hit";
+    R.push(3, L, "Case two, the <b>head</b> matches. There is no node <i>before</i> the head whose " +
+           "<b>next</b> could be rewired &mdash; so the trailing pointer cannot help here.", printed(L));
+    L.nodes[0].state = "free";
+    L.head = L.nodes[0].next;
+    L.size--;
+    R.push(4, L, "Hand it to <b>pop_front()</b>, which already does save, advance, delete from CT 08. " +
+           "<b>head_</b> now points at 20, the old head is freed, and <b>size_</b> went down inside pop_front.",
+           printed(L));
+    R.push(5, L, "Return. Reusing <b>pop_front</b> means the head case is two lines, not a second copy " +
+           "of the pointer logic to get wrong.", printed(L));
+    return R.frames;
+  }
+
+  R.push(3, L, "Case two, the head: <b>10</b> is not <b>" + target + "</b>, so skip it.", printed(L));
+  L.ptr.previous = 0;
+  R.push(8, L, "Case three, the middle or tail. <b>previous</b> starts on the head &mdash; we already " +
+         "know the head is not the match.", printed(L));
+  L.ptr.current = L.nodes[0].next;
+  R.push(9, L, "<b>current</b> starts one step ahead. <b>previous</b> will always trail it by exactly one node.",
+         printed(L));
+
+  while (true) {
+    var c = L.ptr.current;
+    if (c === null) {
+      R.push(10, L, "<b>current</b> is <b>nullptr</b>: no match anywhere. The loop ends.", printed(L));
+      R.push(20, L, "Nothing was removed and <b>size_</b> did not change. Removing a value that is not " +
+             "there is not an error &mdash; it is simply a no-op.", printed(L));
+      return R.frames;
+    }
+    R.push(10, L, "<b>current</b> is not null &mdash; check it.", printed(L));
+    L.nodes[c].state = "now";
+    var hit = L.nodes[c].v === target;
+    if (hit) { L.nodes[c].state = "hit"; }
+    R.push(11, L, "Is <b>" + L.nodes[c].v + "</b> the value? " + (hit
+      ? "<b>Yes.</b> And <b>previous</b> is sitting on exactly the node whose <b>next</b> has to change."
+      : "No."), printed(L));
+    if (hit) {
+      var p = L.ptr.previous;
+      L.nodes[p].next = L.nodes[c].next;
+      L.nodes[p].chg = true;
+      L.nodes[c].state = "cut";
+      R.push(12, L, "<b>Relink first.</b> " + L.nodes[p].v + "&#x2019;s <b>next</b> now skips over " +
+             L.nodes[c].v + (L.nodes[c].next === null ? " to <b>nullptr</b> &mdash; " + L.nodes[p].v +
+             " is the new tail." : " to " + L.nodes[L.nodes[c].next].v + ".") +
+             " This line <i>reads</i> <b>current-&gt;next</b>, so it must run while <b>current</b> still exists.",
+             printed(L));
+      L.nodes[c].state = "free";
+      R.push(13, L, "Now free it. Nothing in the list points at it any more, so nothing is left dangling " +
+             "except <b>current</b> itself &mdash; and we are about to return.", printed(L));
+      L.size--;
+      R.push(14, L, "Shrink <b>size_</b>. Forget this and <b>print()</b> looks right while " +
+             "<b>get_size()</b> is wrong.", printed(L));
+      R.push(15, L, "Return &mdash; <b>remove</b> deletes the <b>first</b> match only. Without this return " +
+             "the loop would carry on through a freed node.", printed(L));
+      return R.frames;
+    }
+    L.nodes[c].state = "";
+    L.ptr.previous = c;
+    R.push(17, L, "No match: <b>previous</b> steps up to where <b>current</b> is.", printed(L));
+    L.ptr.current = L.nodes[c].next;
+    R.push(18, L, "Then <b>current</b> steps ahead. Order matters here too &mdash; move <b>current</b> " +
+           "first and <b>previous</b> would skip a node.", printed(L));
+  }
+});
+
+/* ------------------------------------------------------------------ *
+ * Demo 3 -- the mistakes
+ * ------------------------------------------------------------------ */
+Stepper(document.getElementById("d3"), function (o) {
+  var bug = o.bug || "none";
+  var IF  = '        <span class="kw">if</span> (current-&gt;data == value) {';
+  var RL  = '            previous-&gt;next = current-&gt;next;';
+  var DEL = '            <span class="kw">delete</span> current;';
+  var SZ  = '            --size_;';
+  var RET = '            <span class="kw">return</span>;';
+  var code, L, R, p, c;
+
+  if (bug === "loopnext") {
+    code = [
+      '<span class="cm">// remove(30)</span>',
+      '    <span class="kw">auto</span>* previous = head_;',
+      '    <span class="kw">auto</span>* current  = head_-&gt;next;',
+      '    <span class="kw">while</span> (<span class="bad">current-&gt;next</span>) {   <span class="cm">// from pop_back</span>',
+      IF, RL, DEL, SZ, RET,
+      '        }',
+      '        previous = current;',
+      '        current  = current-&gt;next;',
+      '    }'
+    ];
+    L = makeList([10, 20, 30]);
+    R = Recorder(code, [["value", "30"]]);
+    R.push(0, L, "Remove <b>30</b>, the tail, with the loop condition copied from <b>pop_back</b>.", "");
+    L.ptr.previous = 0; R.push(1, L, "Same set-up as before.", "");
+    L.ptr.current = 1;  R.push(2, L, "&nbsp;", "");
+    R.push(3, L, "<b>current-&gt;next</b> is 30, not null, so the loop runs.", "");
+    L.nodes[1].state = "now"; R.push(4, L, "20 is not 30.", "");
+    L.nodes[1].state = ""; L.ptr.previous = 1; R.push(10, L, "Step <b>previous</b>&hellip;", "");
+    L.ptr.current = 2; R.push(11, L, "&hellip;and <b>current</b>. It is now on <b>30</b>, the one we want.", "");
+    R.push(3, L, "But <b>current-&gt;next</b> is <b>nullptr</b>, so the loop stops <i>before</i> checking " +
+           "the node it is standing on.", "");
+    R.push(12, L, "<b>pop_back</b> wanted to stop <i>on</i> the last node. <b>remove</b> needs to <i>check</i> " +
+           "the last node, so its loop is <b>while (current)</b>.",
+           "WRONG.\n30 is still in the list.\nsize_ is still 3.\nRemoveTail fails.");
+    return R.frames;
+  }
+
+  var early = bug === "early";
+  code = [
+    '<span class="cm">// remove(20), and current is on it</span>',
+    IF,
+    early ? DEL.replace("current;", 'current; <span class="cm">// too soon</span>') : RL,
+    early ? RL.replace("current-&gt;next;", '<span class="bad">current-&gt;next</span>;') : DEL,
+    bug === "nosize" ? '            <span class="cm">// (no --size_)</span>' : SZ,
+    RET,
+    '        }'
+  ];
+  L = makeList([10, 20, 30]);
+  L.ptr.previous = 0; L.ptr.current = 1;
+  R = Recorder(code, [["value", "20"]]);
+  R.push(0, L, "Every version starts here: <b>previous</b> on 10, <b>current</b> on 20, the node to remove.",
+         printed(L));
+  L.nodes[1].state = "hit";
+  R.push(1, L, "Match.", printed(L));
+  p = 0; c = 1;
+  if (early) {
+    L.nodes[c].state = "free";
+    R.push(2, L, "Delete first. <b>current</b> still holds 0x7A40 &mdash; it is dangling now.", printed(L));
+    L.nodes[p].next = "garbage";
+    R.push(3, L, "Then read <b>current-&gt;next</b>&hellip; out of memory that was just handed back. " +
+           "It often still holds the old value, which is exactly why this bug survives testing.",
+           "UNDEFINED BEHAVIOR.\nReading a freed node.");
+    L.size--;
+    R.push(4, L, "The size is updated as if all is well.", "UNDEFINED BEHAVIOR.\nReading a freed node.");
+    R.push(5, L, "Whatever 10&#x2019;s <b>next</b> ended up holding is now the rest of your list. " +
+           "Relink <b>first</b>, then delete.", "UNDEFINED BEHAVIOR.\nThe list now continues into\nwhatever was in freed memory.");
+    return R.frames;
+  }
+  L.nodes[p].next = L.nodes[c].next; L.nodes[p].chg = true; L.nodes[c].state = "cut";
+  R.push(2, L, "Relink: 10 now skips to 30.", printed(L));
+  L.nodes[c].state = "free";
+  R.push(3, L, "Delete the node nothing points at any more.", printed(L));
+  if (bug === "nosize") {
+    R.push(4, L, "No <b>--size_</b>. Nothing crashes and <b>print()</b> is perfect.", printed(L));
+    R.push(5, L, "Which makes this one easy to miss by eye &mdash; the tests catch it because they check " +
+           "<b>get_size()</b> as well as the printout.",
+           "WRONG.\nprints 10 -> 30 -> nullptr\nbut get_size() returns 3.");
+    return R.frames;
+  }
+  L.size--;
+  R.push(4, L, "Shrink the count.", printed(L));
+  R.push(5, L, "Return. Nothing was read after it was freed, nothing is unreachable, and the count is right.",
+         "Correct.\n10 -> 30 -> nullptr, size 2.");
+  return R.frames;
+});
+</script>
+</body>
+</html>
