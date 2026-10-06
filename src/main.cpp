@@ -3,7 +3,7 @@
 #include <iostream>
 
 int main() {
-    std::cout << "=== Code-Together 8: Search & Remove — Farr's Ice Cream ===\n\n";
+    std::cout << "=== Code-Together 09: Search & Remove — Farr's Ice Cream ===\n\n";
 
     // ! DISCUSSION: Farr's Ice Cream now accepts pre-orders by order ID.
     //   Customers submit their order ahead of time and join a queue.
@@ -45,7 +45,7 @@ int main() {
     // ! DISCUSSION: pop_back has to walk the ENTIRE list.
     //   - Traverses to the second-to-last node before it can remove the last one
     //   - That's O(n) — one full traversal per call
-    //   - A doubly linked list (CT9) solves this with a tail_ pointer: O(1)
+    //   - A doubly linked list (CT 10) solves this with a tail_ pointer: O(1)
 
     // =========================================================================
     // PART 2 — contains() and remove(): lookup and cancellation

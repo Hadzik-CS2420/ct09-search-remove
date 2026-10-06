@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.24)
-project(ct8-search-remove LANGUAGES CXX)
+project(ct09-search-remove LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 23)
 

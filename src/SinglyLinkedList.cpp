@@ -81,7 +81,7 @@ void SinglyLinkedList::pop_back() {
     // ! DISCUSSION: pop_back is O(n).
     //   - We must walk the whole list to find the second-to-last node
     //   - pop_front is O(1) — this asymmetry is a key weakness of singly linked lists
-    //   - A doubly linked list (CT9) fixes it with a tail_ pointer
+    //   - A doubly linked list (CT 10) fixes it with a tail_ pointer
     auto* previous = head_;
     auto* current  = head_->next;
     while (current->next) {
